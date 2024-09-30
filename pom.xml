@@ -14,7 +14,7 @@
     <name>spring-6-rest-mvc</name>
     <description>spring-6-rest-mvc</description>
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>
