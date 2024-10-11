@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by jt, Spring Framework Guru.
@@ -96,5 +97,54 @@ public class BeerServiceImpl implements BeerService {
     beerMap.put(newBeer.getId(), newBeer);
 
     return newBeer;
+  }
+
+  @Override
+  public void updateBeerById(UUID beerId, Beer beer) {
+    Beer existingBeer = beerMap.get(beerId);
+    if (existingBeer != null) {
+      existingBeer.setVersion(existingBeer.getVersion() + 1);
+      existingBeer.setBeerName(beer.getBeerName());
+      existingBeer.setPrice(beer.getPrice());
+      existingBeer.setQuantityOnHand(beer.getQuantityOnHand());
+      existingBeer.setUpc(beer.getUpc());
+      existingBeer.setBeerStyle(beer.getBeerStyle());
+      existingBeer.setUpdateDate(LocalDateTime.now());
+    }
+  }
+
+  @Override
+  public void deleteBeerById(UUID beerId) {
+    beerMap.remove(beerId);
+  }
+
+  @Override
+  public void patchBeerById(UUID beerId, Beer beer) {
+    Beer existingBeer = beerMap.get(beerId);
+
+    if(StringUtils.hasText(beer.getBeerName())){
+      existingBeer.setBeerName(beer.getBeerName());
+    }
+
+    if (beer.getBeerStyle() != null) {
+      existingBeer.setBeerStyle(beer.getBeerStyle());
+    }
+
+    if(beer.getPrice() != null){
+      existingBeer.setPrice(beer.getPrice());
+    }
+
+    if(beer.getQuantityOnHand() != null){
+      existingBeer.setQuantityOnHand(beer.getQuantityOnHand());
+    }
+
+    if(StringUtils.hasText(beer.getUpc())){
+      existingBeer.setUpc(beer.getUpc());
+    }
+
+    //log the update
+    existingBeer.setUpdateDate(LocalDateTime.now());
+    existingBeer.setVersion(existingBeer.getVersion() + 1);
+
   }
 }
