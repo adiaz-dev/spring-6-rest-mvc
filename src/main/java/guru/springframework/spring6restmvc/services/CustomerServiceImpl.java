@@ -76,7 +76,7 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
-  public void patchBeerById(UUID customerId, Customer customer) {
+  public void patchCustomerById(UUID customerId, Customer customer) {
     Customer existingCustomer = getCustomerById(customerId);
     boolean actuallyModified = false;
 
