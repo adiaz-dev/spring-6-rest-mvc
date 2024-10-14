@@ -3,6 +3,7 @@ package guru.springframework.spring6restmvc.controller;
 import guru.springframework.spring6restmvc.model.Customer;
 import guru.springframework.spring6restmvc.services.CustomerService;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ public class CustomerController {
   @GetMapping(CUSTOMER_PATH_ID)
   public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
     log.info("Get customer with id {}", customerId);
-    return customerService.getCustomerById(customerId);
+    return customerService.getCustomerById(customerId).orElseThrow(NotFoundException::new);
   }
 
   @PutMapping(CUSTOMER_PATH_ID)

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,9 +46,9 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
-  public Customer getCustomerById(UUID id) {
+  public Optional<Customer> getCustomerById(UUID id) {
     log.debug("Get Customer by Id - in service. Id: " + id.toString());
-    return customerMap.get(id);
+    return Optional.of(customerMap.get(id));
   }
 
   @Override
@@ -62,7 +63,9 @@ public class CustomerServiceImpl implements CustomerService {
 
   @Override
   public void updateCustomer(UUID customerId, Customer customer) {
-    Customer existingCustomer = getCustomerById(customerId);
+    Customer existingCustomer = customerMap.get(customerId);
+        getCustomerById(customerId);
+
     if (existingCustomer != null) {
       existingCustomer.setCustomerName(customer.getCustomerName());
       existingCustomer.setVersion(existingCustomer.getVersion() + 1);
@@ -77,7 +80,7 @@ public class CustomerServiceImpl implements CustomerService {
 
   @Override
   public void patchCustomerById(UUID customerId, Customer customer) {
-    Customer existingCustomer = getCustomerById(customerId);
+    Customer existingCustomer = customerMap.get(customerId);
     boolean actuallyModified = false;
 
     if (StringUtils.hasText(customer.getCustomerName())) {
