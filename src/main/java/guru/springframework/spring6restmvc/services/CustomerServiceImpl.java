@@ -1,6 +1,6 @@
 package guru.springframework.spring6restmvc.services;
 
-import guru.springframework.spring6restmvc.model.Customer;
+import guru.springframework.spring6restmvc.model.CustomerDTO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,21 +16,21 @@ import org.springframework.util.StringUtils;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-  private Map<UUID, Customer> customerMap;
+  private Map<UUID, CustomerDTO> customerMap;
 
   public CustomerServiceImpl() {
     this.customerMap = new HashMap<>();
 
-    Customer customer1 = Customer.builder().id(UUID.randomUUID()).version(1)
+    CustomerDTO customer1 = CustomerDTO.builder().id(UUID.randomUUID()).version(1)
         .customerName("Augusto Diaz").createdDate(LocalDateTime.now())
         .lastModifiedDate(LocalDateTime.now()).build();
-    Customer customer2 = Customer.builder().id(UUID.randomUUID()).version(1)
+    CustomerDTO customer2 = CustomerDTO.builder().id(UUID.randomUUID()).version(1)
         .customerName("Nashiely Campos").createdDate(LocalDateTime.now())
         .lastModifiedDate(LocalDateTime.now()).build();
-    Customer customer3 = Customer.builder().id(UUID.randomUUID()).version(1)
+    CustomerDTO customer3 = CustomerDTO.builder().id(UUID.randomUUID()).version(1)
         .customerName("Valentina Diaz").createdDate(LocalDateTime.now())
         .lastModifiedDate(LocalDateTime.now()).build();
-    Customer customer4 = Customer.builder().id(UUID.randomUUID()).version(1)
+    CustomerDTO customer4 = CustomerDTO.builder().id(UUID.randomUUID()).version(1)
         .customerName("Guadalupe Noriega").createdDate(LocalDateTime.now())
         .lastModifiedDate(LocalDateTime.now()).build();
 
@@ -41,19 +41,19 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
-  public List<Customer> listCustomers() {
+  public List<CustomerDTO> listCustomers() {
     return new ArrayList<>(customerMap.values());
   }
 
   @Override
-  public Optional<Customer> getCustomerById(UUID id) {
+  public Optional<CustomerDTO> getCustomerById(UUID id) {
     log.debug("Get Customer by Id - in service. Id: " + id.toString());
     return Optional.of(customerMap.get(id));
   }
 
   @Override
-  public Customer saveCustomer(Customer customer) {
-    Customer newCustomer = Customer.builder().id(UUID.randomUUID()).version(1)
+  public CustomerDTO saveCustomer(CustomerDTO customer) {
+    CustomerDTO newCustomer = CustomerDTO.builder().id(UUID.randomUUID()).version(1)
         .customerName(customer.getCustomerName()).createdDate(LocalDateTime.now())
         .lastModifiedDate(LocalDateTime.now()).build();
     customerMap.put(newCustomer.getId(), newCustomer);
@@ -62,8 +62,8 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
-  public void updateCustomer(UUID customerId, Customer customer) {
-    Customer existingCustomer = customerMap.get(customerId);
+  public void updateCustomer(UUID customerId, CustomerDTO customer) {
+    CustomerDTO existingCustomer = customerMap.get(customerId);
         getCustomerById(customerId);
 
     if (existingCustomer != null) {
@@ -79,8 +79,8 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
-  public void patchCustomerById(UUID customerId, Customer customer) {
-    Customer existingCustomer = customerMap.get(customerId);
+  public void patchCustomerById(UUID customerId, CustomerDTO customer) {
+    CustomerDTO existingCustomer = customerMap.get(customerId);
     boolean actuallyModified = false;
 
     if (StringUtils.hasText(customer.getCustomerName())) {

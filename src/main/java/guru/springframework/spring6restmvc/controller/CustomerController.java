@@ -1,9 +1,8 @@
 package guru.springframework.spring6restmvc.controller;
 
-import guru.springframework.spring6restmvc.model.Customer;
+import guru.springframework.spring6restmvc.model.CustomerDTO;
 import guru.springframework.spring6restmvc.services.CustomerService;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,33 +29,33 @@ public class CustomerController {
   public static final String CUSTOMER_PATH_ID = CUSTOMER_PATH + "/{customerId}";
 
   @PostMapping(CUSTOMER_PATH)
-  public ResponseEntity handlePost(@RequestBody Customer customer) {
+  public ResponseEntity handlePost(@RequestBody CustomerDTO customer) {
 
     //verify customer has at least a name
     if (StringUtils.isEmpty(customer.getCustomerName())) {
       return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
-    Customer saveCustomer = customerService.saveCustomer(customer);
+    CustomerDTO saveCustomer = customerService.saveCustomer(customer);
     HttpHeaders headers = new HttpHeaders();
     headers.add("Location", CUSTOMER_PATH + "/" + saveCustomer.getId().toString());
     return new ResponseEntity(headers, HttpStatus.CREATED);
   }
 
   @GetMapping(CUSTOMER_PATH)
-  public List<Customer> getAllCustomers() {
+  public List<CustomerDTO> getAllCustomers() {
     log.info("Get all customers from the whole database");
     return customerService.listCustomers();
   }
 
   @GetMapping(CUSTOMER_PATH_ID)
-  public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
+  public CustomerDTO getCustomerById(@PathVariable("customerId") UUID customerId) {
     log.info("Get customer with id {}", customerId);
     return customerService.getCustomerById(customerId).orElseThrow(NotFoundException::new);
   }
 
   @PutMapping(CUSTOMER_PATH_ID)
-  public ResponseEntity updateCustomerById(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer) {
+  public ResponseEntity updateCustomerById(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDTO customer) {
     customerService.updateCustomer(customerId, customer);
     return new ResponseEntity(HttpStatus.NO_CONTENT);
   }
@@ -69,7 +68,7 @@ public class CustomerController {
   }
 
   @PatchMapping(CUSTOMER_PATH_ID)
-  public ResponseEntity patchBeerById(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer) {
+  public ResponseEntity patchBeerById(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDTO customer) {
     customerService.patchCustomerById(customerId, customer);
     return new ResponseEntity(HttpStatus.NO_CONTENT);
   }
