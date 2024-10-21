@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -58,6 +59,8 @@ class BeerControllerTest {
 
     //just create an instance to retrieve one of the beeers
     BeerServiceImpl beerServiceImpl;
+  @Autowired
+  private BeerController beerController;
 
     @BeforeEach
     void setUp() {
@@ -97,6 +100,8 @@ class BeerControllerTest {
     void testDeleteBeer() throws Exception {
         BeerDTO beer = beerServiceImpl.listBeers().get(0);
 
+        given(beerService.deleteBeerById(any())).willReturn(true);
+
         mockMvc.perform(delete(BeerController.BEER_PATH_ID, beer.getId() )
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
@@ -108,6 +113,7 @@ class BeerControllerTest {
         assertThat(beer.getId()).isEqualTo(uuidArgumentCaptor.getValue());
     }
 
+
     /**
      * Test a put request
      * */
@@ -115,6 +121,7 @@ class BeerControllerTest {
     void updateBeer() throws Exception {
         BeerDTO beer = beerServiceImpl.listBeers().get(0);
 
+        given(beerService.updateBeerById(any(), any())).willReturn(Optional.of(beer));
 
         mockMvc.perform(put(BeerController.BEER_PATH_ID, beer.getId() )
                 .accept(MediaType.APPLICATION_JSON)

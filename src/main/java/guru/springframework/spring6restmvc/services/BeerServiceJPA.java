@@ -6,6 +6,7 @@ import guru.springframework.spring6restmvc.repositories.BeerRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -36,19 +37,31 @@ public class BeerServiceJPA implements BeerService {
   }
 
   @Override
-  public void updateBeerById(UUID beerId, BeerDTO beer) {
-    beerRepository.findById(beerId).ifPresent(foundBeer ->{
+  public Optional<BeerDTO> updateBeerById(UUID beerId, BeerDTO beer) {
+
+    AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
+
+    beerRepository.findById(beerId).ifPresentOrElse(foundBeer ->{
       foundBeer.setBeerName(beer.getBeerName());
       foundBeer.setBeerStyle(beer.getBeerStyle());
       foundBeer.setUpc(beer.getUpc());
       foundBeer.setPrice(beer.getPrice());
-      beerRepository.save(foundBeer);
+      atomicReference.set(Optional.of(beerMapper.beerToBeerDto(beerRepository.save(foundBeer))));
+    }, () -> {
+      atomicReference.set(Optional.empty());
     });
+
+    return atomicReference.get();
   }
 
   @Override
-  public void deleteBeerById(UUID beerId) {
+  public Boolean deleteBeerById(UUID beerId) {
+    if(beerRepository.existsById(beerId)) {
+      beerRepository.deleteById(beerId);
+      return true;
+    }
 
+    return false;
   }
 
   @Override
