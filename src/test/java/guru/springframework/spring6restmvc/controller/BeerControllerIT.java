@@ -30,7 +30,6 @@ class BeerControllerIT {
   BeerMapper beerMapper;
 
 
-
   @Test
   void testDeleteByIdNotFound() {
     assertThrows(NotFoundException.class, () -> {
