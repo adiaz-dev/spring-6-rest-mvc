@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -186,4 +185,21 @@ class BeerControllerTest {
 
 
     }
+
+  /**
+   * If beer name is blank, 400 error is returned
+   * */
+  @Test
+  void testCreateBeerNullBeerName() throws Exception {
+    BeerDTO beerDto = BeerDTO.builder().build();
+
+    //given
+    given(beerService.saveBeer(any(BeerDTO.class))).willReturn(beerServiceImpl.listBeers().get(1));
+
+    mockMvc.perform(post(BeerController.BEER_PATH )
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(beerDto)))
+        .andExpect(status().isBadRequest());
+  }
 }
