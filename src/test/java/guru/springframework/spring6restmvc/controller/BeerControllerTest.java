@@ -34,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 
 @WebMvcTest(BeerController.class)
@@ -117,7 +118,7 @@ class BeerControllerTest {
      * Test a put request
      * */
     @Test
-    void updateBeer() throws Exception {
+    void testUpdateBeer() throws Exception {
         BeerDTO beer = beerServiceImpl.listBeers().get(0);
 
         given(beerService.updateBeerById(any(), any())).willReturn(Optional.of(beer));
@@ -132,7 +133,25 @@ class BeerControllerTest {
         verify(beerService, times(1)).updateBeerById(any(UUID.class), any(BeerDTO.class));
     }
 
-    /**
+  @Test
+  void testUpdateBeerBlankName() throws Exception {
+    BeerDTO beer = beerServiceImpl.listBeers().get(0);
+    beer.setBeerName("");
+
+    given(beerService.updateBeerById(any(), any())).willReturn(Optional.of(beer));
+
+    mockMvc.perform(put(BeerController.BEER_PATH_ID, beer.getId() )
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(beer)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.length()",is(1)));
+
+
+  }
+
+
+  /**
      * Test a post request
      * */
     @Test
@@ -196,10 +215,14 @@ class BeerControllerTest {
     //given
     given(beerService.saveBeer(any(BeerDTO.class))).willReturn(beerServiceImpl.listBeers().get(1));
 
-    mockMvc.perform(post(BeerController.BEER_PATH )
+    MvcResult mvcResult = mockMvc.perform(post(BeerController.BEER_PATH )
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(beerDto)))
-        .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.length()", is(6)))
+        .andReturn();
+
+    System.out.println(mvcResult.getResponse().getContentAsString());
   }
 }
