@@ -1,21 +1,34 @@
 package guru.springframework.spring6restmvc.controller;
 
+import static org.hamcrest.core.Is.is;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.spring6restmvc.entities.Beer;
 import guru.springframework.spring6restmvc.mappers.BeerMapper;
 import guru.springframework.spring6restmvc.model.BeerDTO;
 import guru.springframework.spring6restmvc.repositories.BeerRepository;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 class BeerControllerIT {
@@ -28,6 +41,37 @@ class BeerControllerIT {
 
   @Autowired
   BeerMapper beerMapper;
+
+  @Autowired
+  WebApplicationContext wac;
+
+  MockMvc mockMvc;
+
+  @Autowired
+  ObjectMapper objectMapper;
+
+  @BeforeEach
+  void setUp() {
+    mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+  }
+
+  @Test
+  void testPatchBeer() throws Exception {
+    Beer beer = beerRepository.findAll().get(0);
+
+    Map<String, Object> beerMap = new HashMap<>();
+    beerMap.put("beerName", "New name of beer is very long, such as long that I cannot cound the number of characters used in the beer name that describes the name of this delicious beer made in Mexico");
+
+    MvcResult result = mockMvc.perform(patch(BeerController.BEER_PATH_ID, beer.getId() )
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(beerMap)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.length()", is(1)))
+        .andReturn();
+
+    System.out.println(result.getResponse().getContentAsString());
+  }
 
 
   @Test

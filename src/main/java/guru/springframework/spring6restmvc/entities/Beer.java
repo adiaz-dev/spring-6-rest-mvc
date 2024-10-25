@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,11 +38,16 @@ public class Beer {
 
   @NotNull
   @NotBlank
+  @Size(max = 50)
+  @Column(length = 50, nullable = false)
   private String beerName;
   @NotNull
   private BeerStyle beerStyle;
+
   @NotNull
   @NotBlank
+  @Size(max = 255)
+  @Column(length = 255, nullable = false)
   private String upc;
   private Integer quantityOnHand;
   @NotNull
