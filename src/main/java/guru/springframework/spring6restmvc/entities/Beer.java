@@ -44,7 +44,9 @@ public class Beer {
   @Size(max = 50)
   @Column(length = 50, nullable = false)
   private String beerName;
+
   @NotNull
+  @JdbcTypeCode(value = SqlTypes.SMALLINT)
   private BeerStyle beerStyle;
 
   @NotNull
