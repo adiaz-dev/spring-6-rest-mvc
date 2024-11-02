@@ -1,7 +1,9 @@
 package guru.springframework.spring6restmvc.services;
 
+import guru.springframework.spring6restmvc.entities.Beer;
 import guru.springframework.spring6restmvc.mappers.BeerMapper;
 import guru.springframework.spring6restmvc.model.BeerDTO;
+import guru.springframework.spring6restmvc.model.BeerStyle;
 import guru.springframework.spring6restmvc.repositories.BeerRepository;
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +25,27 @@ public class BeerServiceJPA implements BeerService {
   private final BeerMapper beerMapper;
 
   @Override
-  public List<BeerDTO> listBeers() {
-    return beerRepository.findAll().stream().map(beerMapper::beerToBeerDto).collect(Collectors.toList());
+  public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle) {
+    List<Beer> beerList;
+
+    //filter by name
+    if(StringUtils.hasText(beerName) && beerStyle == null) {
+      beerList = listBeersByName(beerName);
+    } else if (!StringUtils.hasText(beerName) && beerStyle != null) { //filter by beerStyle
+      beerList = listBeerByStyle(beerStyle);
+    } else {
+      beerList = beerRepository.findAll();
+    }
+
+    return beerList.stream().map(beerMapper::beerToBeerDto).collect(Collectors.toList());
+  }
+
+  public List<Beer> listBeersByName(String beerName) {
+    return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%");
+  }
+
+  public List<Beer> listBeerByStyle(BeerStyle beerStyle) {
+    return beerRepository.findAllByBeerStyle(beerStyle);
   }
 
   @Override
