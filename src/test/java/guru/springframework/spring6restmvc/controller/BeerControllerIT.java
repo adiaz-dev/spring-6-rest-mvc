@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -145,7 +145,6 @@ class BeerControllerIT {
   }
 
   @Test
-  @Disabled
   void testListBeersByStyleAndName() throws Exception {
     mockMvc.perform(get(BeerController.BEER_PATH)
             .queryParam("beerName","IPA")
@@ -155,8 +154,30 @@ class BeerControllerIT {
   }
 
   @Test
+  void testListBeersByStyleAndNameAnsShowInventoryFalse() throws Exception {
+    mockMvc.perform(get(BeerController.BEER_PATH)
+            .queryParam("beerName","IPA")
+            .queryParam("beerStyle", BeerStyle.IPA.name())
+            .queryParam("showInventory", "false"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.size()",is(310)))
+        .andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.nullValue()));
+  }
+
+  @Test
+  void testListBeersByStyleAndNameAnsShowInventoryTrue() throws Exception {
+    mockMvc.perform(get(BeerController.BEER_PATH)
+            .queryParam("beerName","IPA")
+            .queryParam("beerStyle", BeerStyle.IPA.name())
+            .queryParam("showInventory", "true"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.size()",is(310)))
+        .andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.notNullValue()));
+  }
+
+  @Test
   void testListBeers() {
-    List<BeerDTO> dtos  = beerController.listBeers(null, null);
+    List<BeerDTO> dtos  = beerController.listBeers(null, null, false);
     assertThat(dtos.size()).isEqualTo(2413);
   }
 
@@ -165,7 +186,7 @@ class BeerControllerIT {
   @Test
   void testEmptyListBeers() {
     beerRepository.deleteAll();
-    List<BeerDTO> dtos  = beerController.listBeers(null, null);
+    List<BeerDTO> dtos  = beerController.listBeers(null, null, false);
     assertThat(dtos.size()).isEqualTo(0);
   }
 
