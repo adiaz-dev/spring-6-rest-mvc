@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Created by jt, Spring Framework Guru.
+ * Created by Augusto Diaz
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -55,8 +55,10 @@ public class BeerController {
     @GetMapping(BEER_PATH)
     public List<BeerDTO> listBeers(@RequestParam(value = "beerName", required = false) String beerName,
         @RequestParam(value = "beerStyle", required = false) BeerStyle beerStyle,
-        @RequestParam(value = "showInventory", required = false) Boolean showInventory) {
-        return beerService.listBeers(beerName, beerStyle, showInventory);
+        @RequestParam(value = "showInventory", required = false) Boolean showInventory,
+        @RequestParam(required = false) Integer pageNumber,
+        @RequestParam(required = false) Integer pageSize) {
+        return beerService.listBeers(beerName, beerStyle, showInventory, pageNumber, pageSize);
     }
 
     @GetMapping(BEER_PATH_ID)

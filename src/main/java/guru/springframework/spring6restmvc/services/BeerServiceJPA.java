@@ -25,7 +25,8 @@ public class BeerServiceJPA implements BeerService {
   private final BeerMapper beerMapper;
 
   @Override
-  public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory) {
+  public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory,
+      Integer pageNumber, Integer pageSize) {
     List<Beer> beerList;
 
     //filter by name
