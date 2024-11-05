@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -24,10 +25,37 @@ public class BeerServiceJPA implements BeerService {
   private final BeerRepository beerRepository;
   private final BeerMapper beerMapper;
 
+  //default settings for page request
+  private static final int DEFAULT_PAGE_NUMBER = 0;
+  private static final int DEFAULT_PAGE_SIZE = 25;
+
+  public PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
+    int queryPageNumber = DEFAULT_PAGE_NUMBER;
+    int queryPageSize = DEFAULT_PAGE_SIZE;
+
+    if (pageNumber != null && pageNumber > 0 ) {
+      queryPageNumber = pageNumber;
+    }
+
+    if(pageSize != null && pageSize > 0){
+      if (pageSize > 1000) {
+        queryPageSize = 1000;
+      } else {
+        queryPageSize = pageSize - 1;
+      }
+    }
+
+    return PageRequest.of(queryPageNumber, queryPageSize);
+  }
+
+
   @Override
   public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory,
       Integer pageNumber, Integer pageSize) {
     List<Beer> beerList;
+
+    //build the page request
+    PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
 
     //filter by name
     if(StringUtils.hasText(beerName) && beerStyle == null) {
