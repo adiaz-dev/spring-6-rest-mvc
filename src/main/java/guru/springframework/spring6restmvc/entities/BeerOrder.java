@@ -4,27 +4,29 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Version;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
 @Builder
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Customer {
+@Entity
+public class BeerOrder {
 
   @Id
   @GeneratedValue(generator = "UUID")
@@ -34,16 +36,21 @@ public class Customer {
   private UUID id;
 
   @Version
-  private Integer version;
+  private Long version;
 
-  private String customerName;
+  private String customerRef;
 
-  @Column(length = 255)
-  private String email;
+  @ManyToOne
+  private Customer customer;
 
+  @CreationTimestamp
+  @Column(updatable = false)
   private LocalDateTime createdDate;
+
+  @UpdateTimestamp
   private LocalDateTime lastModifiedDate;
 
-  @OneToMany(mappedBy = "customer")
-  private Set<BeerOrder> beerOrders;
+  public boolean isNew(){
+    return this.id == null;
+  }
 }
