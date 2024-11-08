@@ -5,9 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,4 +55,7 @@ public class BeerOrder {
   public boolean isNew(){
     return this.id == null;
   }
+
+  @OneToMany(mappedBy = "beerOrder")
+  private Set<BeerOrderLine> beerOrderLines;
 }
