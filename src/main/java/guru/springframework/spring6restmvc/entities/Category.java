@@ -1,7 +1,9 @@
 package guru.springframework.spring6restmvc.entities;
 
 import jakarta.persistence.*;
+import java.util.HashSet;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +19,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -41,11 +44,12 @@ public class Category {
 
   private String description;
 
+  @Builder.Default
   @ManyToMany
   @JoinTable(name = "beer_category",
       joinColumns = @JoinColumn(name = "category_id"),
       inverseJoinColumns = @JoinColumn(name = "beer_id"))
-  private Set<Beer> beers;
+  private Set<Beer> beers = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {
