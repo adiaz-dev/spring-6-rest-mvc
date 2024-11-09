@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -45,5 +46,5 @@ public class Customer {
   private LocalDateTime lastModifiedDate;
 
   @OneToMany(mappedBy = "customer")
-  private Set<BeerOrder> beerOrders;
+  private Set<BeerOrder> beerOrders = new HashSet<>();
 }

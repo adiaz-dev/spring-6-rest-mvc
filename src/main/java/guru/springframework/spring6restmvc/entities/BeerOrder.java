@@ -7,11 +7,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +23,6 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class BeerOrder {
@@ -52,8 +49,26 @@ public class BeerOrder {
   @UpdateTimestamp
   private LocalDateTime lastModifiedDate;
 
+  public BeerOrder(UUID id, Long version, String customerRef, Customer customer,
+      LocalDateTime createdDate, LocalDateTime lastModifiedDate,
+      Set<BeerOrderLine> beerOrderLines) {
+    this.id = id;
+    this.version = version;
+    this.customerRef = customerRef;
+    setCustomer(customer);//additionally it sets the relationship
+    this.createdDate = createdDate;
+    this.lastModifiedDate = lastModifiedDate;
+    this.beerOrderLines = beerOrderLines;
+  }
+
   public boolean isNew(){
     return this.id == null;
+  }
+
+  //Sets the relationship of this beer order with the current customer
+  public void setCustomer(Customer customer) {
+    this.customer = customer;
+    customer.getBeerOrders().add(this);
   }
 
   @OneToMany(mappedBy = "beerOrder")
