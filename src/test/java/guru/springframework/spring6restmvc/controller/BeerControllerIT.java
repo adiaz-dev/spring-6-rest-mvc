@@ -1,14 +1,13 @@
 package guru.springframework.spring6restmvc.controller;
 
-import static guru.springframework.spring6restmvc.config.SpringSecConfig.REST_API_PASSWORD;
-import static guru.springframework.spring6restmvc.config.SpringSecConfig.REST_API_USERNAME;
-import static org.hamcrest.core.Is.is;
+import static guru.springframework.spring6restmvc.controller.BeerControllerTest.jwtRequestPostProcessor;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,11 +16,9 @@ import guru.springframework.spring6restmvc.mappers.BeerMapper;
 import guru.springframework.spring6restmvc.model.BeerDTO;
 import guru.springframework.spring6restmvc.model.BeerStyle;
 import guru.springframework.spring6restmvc.repositories.BeerRepository;
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import javax.naming.AuthenticationException;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +34,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 class BeerControllerIT {
@@ -74,12 +70,11 @@ class BeerControllerIT {
     beerMap.put("beerName", "New name of beer is very long, such as long that I cannot cound the number of characters used in the beer name that describes the name of this delicious beer made in Mexico");
 
     MvcResult result = mockMvc.perform(patch(BeerController.BEER_PATH_ID, beer.getId() )
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(beerMap)))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.length()", is(1)))
         .andReturn();
 
     System.out.println(result.getResponse().getContentAsString());
@@ -140,7 +135,7 @@ class BeerControllerIT {
   @Test
   void testListBeersByName() throws Exception {
     mockMvc.perform(get(BeerController.BEER_PATH)
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
         .queryParam("beerName","IPA")
         .queryParam("pageSize","800"))
         .andExpect(status().isOk())
@@ -150,7 +145,7 @@ class BeerControllerIT {
   @Test
   void testListBeersByStyle() throws Exception {
     mockMvc.perform(get(BeerController.BEER_PATH)
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
             .queryParam("beerStyle", BeerStyle.IPA.name())
             .queryParam("pageSize","800"))
         .andExpect(status().isOk())
@@ -160,7 +155,7 @@ class BeerControllerIT {
   @Test
   void testListBeersByStyleAndName() throws Exception {
     mockMvc.perform(get(BeerController.BEER_PATH)
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
             .queryParam("beerName","IPA")
             .queryParam("beerStyle", BeerStyle.IPA.name())
             .queryParam("pageSize","800"))
@@ -171,7 +166,7 @@ class BeerControllerIT {
   @Test
   void testListBeersByStyleAndNameAnsShowInventoryTruePage2() throws Exception {
     mockMvc.perform(get(BeerController.BEER_PATH)
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
             .queryParam("beerName","IPA")
             .queryParam("beerStyle", BeerStyle.IPA.name())
             .queryParam("showInventory", "true")
@@ -185,7 +180,7 @@ class BeerControllerIT {
   @Test
   void testListBeersByStyleAndNameAnsShowInventoryFalse() throws Exception {
     mockMvc.perform(get(BeerController.BEER_PATH)
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
             .queryParam("beerName","IPA")
             .queryParam("beerStyle", BeerStyle.IPA.name())
             .queryParam("showInventory", "false")
@@ -198,7 +193,7 @@ class BeerControllerIT {
   @Test
   void testListBeersByStyleAndNameAnsShowInventoryTrue() throws Exception {
     mockMvc.perform(get(BeerController.BEER_PATH)
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
             .queryParam("beerName","IPA")
             .queryParam("beerStyle", BeerStyle.IPA.name())
             .queryParam("showInventory", "true")

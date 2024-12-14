@@ -1,14 +1,12 @@
 package guru.springframework.spring6restmvc.controller;
 
-import static guru.springframework.spring6restmvc.config.SpringSecConfig.REST_API_PASSWORD;
-import static guru.springframework.spring6restmvc.config.SpringSecConfig.REST_API_USERNAME;
+import static guru.springframework.spring6restmvc.controller.BeerControllerTest.jwtRequestPostProcessor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -75,7 +73,7 @@ class CustomerControllerTest {
         customerMap.put("customerName", "New name of customer");
 
         mockMvc.perform(patch(CustomerController.CUSTOMER_PATH_ID, customer.getId() )
-                .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+                .with(jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customerMap)))
@@ -96,7 +94,7 @@ class CustomerControllerTest {
         given(customerService.deleteCustomerById(any())).willReturn(true);
 
         mockMvc.perform(delete(CustomerController.CUSTOMER_PATH_ID, customer.getId() )
-                .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+                .with(jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
@@ -117,7 +115,7 @@ class CustomerControllerTest {
         given(customerService.updateCustomer(any(), any())).willReturn(Optional.of(customer));
 
         mockMvc.perform(put(CustomerController.CUSTOMER_PATH_ID, customer.getId() )
-                .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+                .with(jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customer)))
@@ -135,7 +133,7 @@ class CustomerControllerTest {
         System.out.println(objectMapper.writeValueAsString(customer));
 
         mockMvc.perform(post(CustomerController.CUSTOMER_PATH )
-                .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+                .with(jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customer)))
@@ -155,7 +153,7 @@ class CustomerControllerTest {
         given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(customerServiceImpl.listCustomers().get(1));
 
         mockMvc.perform(post(CustomerController.CUSTOMER_PATH )
-                .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+                .with(jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customer)))
@@ -169,7 +167,7 @@ class CustomerControllerTest {
         given(customerService.listCustomers()).willReturn(customerServiceImpl.listCustomers());
 
         mockMvc.perform(get(CustomerController.CUSTOMER_PATH )
-                .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+                .with(jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -186,7 +184,7 @@ class CustomerControllerTest {
         given(customerService.getCustomerById(customer.getId())).willReturn(Optional.of(customer));
 
         mockMvc.perform(get(CustomerController.CUSTOMER_PATH_ID, customer.getId())
-                .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+                .with(jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -202,7 +200,7 @@ class CustomerControllerTest {
         given(customerService.getCustomerById(any(UUID.class))).willReturn(Optional.empty());
 
         mockMvc.perform(get(CustomerController.CUSTOMER_PATH_ID, UUID.randomUUID())
-            .with(httpBasic(REST_API_USERNAME, REST_API_PASSWORD))
+            .with(jwtRequestPostProcessor)
         ).andExpect(status().isNotFound());
     }
 }
